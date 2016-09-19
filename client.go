@@ -130,7 +130,10 @@ func (m *MiPush) doPost(url string, params map[string]string) ([]byte, error) {
 	var req *http.Request
 	var resp *http.Response
 	var err error
-	data, _ := json.Marshal(params)
+	data, err := json.Marshal(params)
+	if err != nil {
+		return nil, err
+	}
 	req, err = http.NewRequest("POST", url, bytes.NewBuffer(data))
 	req.Header.Set("X-PUSH-OS", runtime.GOOS)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
