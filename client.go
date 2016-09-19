@@ -27,17 +27,44 @@ func NewClient(appSecret, packageName string) *MiPush {
 
 func (m *MiPush) Push(msg *Message, regIDList []string) (*Result, error) {
 	params := m.assemblePushParams(msg, regIDList)
-	return m.doPost(m.host+RegURL, params)
+	bytes, err := m.doPost(m.host+RegURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result Result
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
-func (m *MiPush) Stats(start, end string) (*Result, error) {
+func (m *MiPush) Stats(start, end string) (*StatsResult, error) {
 	params := m.assembleStatsParams(start, end)
-	return m.doGet(m.host+StatsURL, params)
+	bytes, err := m.doGet(m.host+StatsURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result StatsResult
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
-func (m *MiPush) Status(msgID string) (*Result, error) {
+func (m *MiPush) Status(msgID string) (*StatusResult, error) {
 	params := m.assembleStatusParams(msgID)
-	return m.doGet(m.host+MessageStatusURL, params)
+	bytes, err := m.doGet(m.host+MessageStatusURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result StatusResult
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
 func (m *MiPush) assemblePushParams(msg *Message, regIDList []string) map[string]string {
@@ -87,7 +114,7 @@ func (m *MiPush) assembleStatusParams(msgID string) string {
 	return "?" + form.Encode()
 }
 
-func (m *MiPush) handlePushResponse(response *http.Response) (*Result, error) {
+func (m *MiPush) handleResponse(response *http.Response) ([]byte, error) {
 	defer func() {
 		_ = response.Body.Close()
 	}()
@@ -95,11 +122,11 @@ func (m *MiPush) handlePushResponse(response *http.Response) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	return getResultFromJSON(data)
+	return data, nil
 }
 
-func (m *MiPush) doPost(url string, params map[string]string) (*Result, error) {
-	var result *Result
+func (m *MiPush) doPost(url string, params map[string]string) ([]byte, error) {
+	var result []byte
 	var req *http.Request
 	var resp *http.Response
 	var err error
@@ -114,16 +141,15 @@ func (m *MiPush) doPost(url string, params map[string]string) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = resp.Body.Close() }()
-	result, err = m.handlePushResponse(resp)
+	result, err = m.handleResponse(resp)
 	if err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
-func (m *MiPush) doGet(url string, params string) (*Result, error) {
-	var result *Result
+func (m *MiPush) doGet(url string, params string) ([]byte, error) {
+	var result []byte
 	var req *http.Request
 	var resp *http.Response
 	var err error
@@ -136,8 +162,7 @@ func (m *MiPush) doGet(url string, params string) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = resp.Body.Close() }()
-	result, err = m.handlePushResponse(resp)
+	result, err = m.handleResponse(resp)
 	if err != nil {
 		return nil, err
 	}

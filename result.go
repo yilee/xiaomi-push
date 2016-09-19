@@ -1,7 +1,5 @@
 package xiaomipush
 
-import "encoding/json"
-
 type Result struct {
 	MessageID   string `json:"trace_id"`
 	Code        int64  `json:"code"`
@@ -32,13 +30,4 @@ type StatusResult struct {
 		TimeToLive   string
 		ClickRate    string
 	} `json:"data,omitempty"`
-}
-
-func getResultFromJSON(data []byte) (*Result, error) {
-	var result Result
-	err := json.Unmarshal(data, &result)
-	if err != nil {
-		return nil, err
-	}
-	return &result, err
 }
