@@ -11,6 +11,7 @@ const (
 	MultiMessagesURL = "/v2/multi_messages/regids"  // 针对不同的regid推送不同的消息
 	StatsURL         = "/v1/stats/message/counters" // 统计push
 	MessageStatusURL = "/v1/trace/message/status"   // 获取指定ID的消息状态
+	MultiTopicURL    = "v3/message/multi_topic"
 )
 
 // for future targeted push
