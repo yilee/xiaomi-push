@@ -9,12 +9,17 @@ type Result struct {
 
 type StatsResult struct {
 	Result
-	Data []struct {
-		Date                string `json:"date"`
-		SingleRecipients    int64  `json:"single_recipients"`
-		BroadcastRecipients int64  `json:"broadcast_recipients"`
-		Received            int64  `json:"received"`
-		Click               int64  `json:"click"`
+	Data struct {
+		Data []struct {
+			Date                  string `json:"date"`
+			AliasRecipients       int64  `json:"alias_recipients"`
+			UserAccountRecipients int64  `json:"useraccount_recipients"`
+			RegidRecipients       int64  `json:"regid_recipients"`
+			Received              int64  `json:"received"`
+			BroadcastRecipients   int64  `json:"broadcast_recipients"`
+			Click                 int64  `json:"click"`
+			SingleRecipients      int64  `json:"single_recipients"`
+		} `json:"data,omitempty"`
 	} `json:"data,omitempty"`
 }
 

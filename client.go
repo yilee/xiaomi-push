@@ -1,12 +1,10 @@
 package xiaomipush
 
 import (
-	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"runtime"
 	"strconv"
 	"strings"
 )
@@ -67,37 +65,36 @@ func (m *MiPush) Status(msgID string) (*StatusResult, error) {
 	return &result, nil
 }
 
-func (m *MiPush) assemblePushParams(msg *Message, regIDList []string) map[string]string {
-	params := make(map[string]string)
-	params["registration_id"] = strings.Join(regIDList, ",")
-	params["restricted_package_name"] = m.packageName
-
+func (m *MiPush) assemblePushParams(msg *Message, regIDList []string) url.Values {
+	form := url.Values{}
+	form.Add("registration_id", strings.Join(regIDList, ","))
+	form.Add("registration_id", m.packageName)
 	if msg.timeToLive > 0 {
-		params["time_to_live"] = strconv.FormatInt(msg.timeToLive, 10)
+		form.Add("time_to_live", strconv.FormatInt(msg.timeToLive, 10))
 	}
 	if len(msg.payload) > 0 {
-		params["payload"] = msg.payload
+		form.Add("payload", msg.payload)
 	}
 	if len(msg.title) > 0 {
-		params["title"] = msg.title
+		form.Add("title", msg.title)
 	}
 	if len(msg.description) > 0 {
-		params["description"] = msg.description
+		form.Add("description", msg.description)
 	}
-	params["notify_type"] = strconv.FormatInt(int64(msg.notifyType), 10)
-	params["pass_through"] = strconv.FormatInt(int64(msg.passThrough), 10)
+	form.Add("notify_type", strconv.FormatInt(int64(msg.notifyType), 10))
+	form.Add("pass_through", strconv.FormatInt(int64(msg.passThrough), 10))
 	if msg.notifyID > 0 {
-		params["notify_id"] = strconv.FormatInt(msg.notifyID, 10)
+		form.Add("notify_id", strconv.FormatInt(int64(msg.notifyID), 10))
 	}
 	if msg.timeToSend > 0 {
-		params["time_to_send"] = strconv.FormatInt(msg.timeToSend, 10)
+		form.Add("time_to_send", strconv.FormatInt(int64(msg.timeToSend), 10))
 	}
 	if msg.extra != nil && len(msg.extra) > 0 {
 		for k, v := range msg.extra {
-			params["extra."+k] = v
+			form.Add("extra."+k, v)
 		}
 	}
-	return params
+	return form
 }
 
 func (m *MiPush) assembleStatsParams(start, end string) string {
@@ -125,20 +122,14 @@ func (m *MiPush) handleResponse(response *http.Response) ([]byte, error) {
 	return data, nil
 }
 
-func (m *MiPush) doPost(url string, params map[string]string) ([]byte, error) {
+func (m *MiPush) doPost(url string, form url.Values) ([]byte, error) {
 	var result []byte
 	var req *http.Request
 	var resp *http.Response
 	var err error
-	data, err := json.Marshal(params)
-	if err != nil {
-		return nil, err
-	}
-	req, err = http.NewRequest("POST", url, bytes.NewBuffer(data))
-	req.Header.Set("X-PUSH-OS", runtime.GOOS)
+	req, err = http.NewRequest("POST", url, strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
-	req.Header.Set("Authorizatione", "key="+m.appSecret)
-
+	req.Header.Set("Authorization", "key="+m.appSecret)
 	client := &http.Client{}
 	resp, err = client.Do(req)
 	if err != nil {
@@ -158,7 +149,7 @@ func (m *MiPush) doGet(url string, params string) ([]byte, error) {
 	var err error
 	req, err = http.NewRequest("GET", url+params, nil)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
-	req.Header.Set("Authorizatione", "key="+m.appSecret)
+	req.Header.Set("Authorization", "key="+m.appSecret)
 
 	client := &http.Client{}
 	resp, err = client.Do(req)
