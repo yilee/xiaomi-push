@@ -9,8 +9,8 @@ import (
 var client = xm.NewClient("appSecret", "packageName")
 
 func main() {
-	msg := xm.NewMessage("hi baby")
-	result, err := client.Push(msg, []string{"fake_reg_id_1", "fake_reg_id_2"})
+	msg := xm.NewMessage("hi baby", "hi ")
+	result, err := client.Send(msg, "fake_reg_id_1")
 	fmt.Println("result1, err1", result, err)
 
 	result2, err := client.Stats("20160901", "20160902")

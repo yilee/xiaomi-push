@@ -23,7 +23,7 @@ func NewClient(appSecret, packageName string) *MiPush {
 	}
 }
 
-func (m *MiPush) Send(msg *Message, regID []string) (*Result, error) {
+func (m *MiPush) Send(msg *Message, regID string) (*Result, error) {
 	params := m.assembleSendParams(msg, regID)
 	bytes, err := m.doPost(m.host+RegURL, params)
 	if err != nil {
@@ -217,7 +217,7 @@ func (m *MiPush) assembleBroadcastParams(msg *Message, topic string) url.Values 
 	return form
 }
 
-func (m *MiPush) assembleSendParams(msg *Message, regID []string) url.Values {
+func (m *MiPush) assembleSendParams(msg *Message, regID string) url.Values {
 	form := url.Values{}
 	form.Add("registration_id", regID)
 	form.Add("restricted_package_name", m.packageName)
