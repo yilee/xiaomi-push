@@ -9,7 +9,7 @@ import (
 var client = xm.NewClient("appSecret", "packageName")
 
 func main() {
-	msg := xm.NewMessage("hi baby", "hi ")
+	msg := xm.NewAndroidMessage("hi baby", "hi ")
 	result, err := client.Send(msg, "fake_reg_id_1")
 	fmt.Println("result1, err1", result, err)
 

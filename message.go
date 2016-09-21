@@ -24,15 +24,19 @@ const (
 	MaxTimeToLive = time.Hour * 24 * 7 * 2
 )
 
-func NewMessage(title, description string) *Message {
+func NewAndroidMessage(title, description string) *Message {
 	return &Message{
-		uniqueID:    "",
-		payload:     "",
-		title:       "",
-		description: "",
-		passThrough: 0,
-		notifyType:  -1, // default notify type
-		extra:       make(map[string]string),
+		uniqueID:               "",
+		payload:                "",
+		title:                  "",
+		description:            "",
+		passThrough:            0,
+		notifyType:             -1, // default notify type
+		restrictedPackageNames: nil,
+		timeToLive:             0,
+		timeToSend:             0,
+		notifyID:               0,
+		extra:                  make(map[string]string),
 	}
 }
 
@@ -76,6 +80,11 @@ func (m *Message) SetTimeToLive(ttl int64) *Message {
 	} else {
 		m.timeToLive = ttl
 	}
+	return m
+}
+
+func (m *Message) SetNotifyID(notifyID int64) *Message {
+	m.notifyID = notifyID
 	return m
 }
 
@@ -134,61 +143,36 @@ func (tm *TargetedMessage) SetTarget(target string) *TargetedMessage {
 
 //-----------------------------------------------------------------------------------//
 // 发送给IOS设备的Message对象
-type IOSMessage struct {
-	uniqueID    string            `json:"unique_id"`    // 消息唯一ID
-	description string            `json:"description"`  // 通知栏展示的通知的描述
-	timeToLive  int64             `json:"time_to_live"` // 可选项。如果用户离线，设置消息在服务器保存的时间，单位：ms。服务器默认最长保留两周。
-	timeToSend  int64             `json:"time_to_send"` // 可选项。定时发送消息。timeToSend是以毫秒为单位的时间戳。注：仅支持七天内的定时消息。
-	extra       map[string]string `json:"unique_id"`    // 可选项，自定义键值对。控制客户端的行为。注：至多可以设置10个key-value键值对。
-}
-
-func NewIOSMessage(description string) *IOSMessage {
-	return &IOSMessage{
-		uniqueID:    "",
-		description: description,
-		timeToLive:  0,
-		timeToSend:  0,
-		extra:       make(map[string]string),
+func NewIOSMessage(description string) *Message {
+	return &Message{
+		uniqueID:               "",
+		payload:                "",
+		title:                  "",
+		description:            description,
+		passThrough:            0,
+		notifyType:             -1, // default notify type
+		restrictedPackageNames: nil,
+		timeToLive:             0,
+		timeToSend:             0,
+		notifyID:               0,
+		extra:                  make(map[string]string),
 	}
 }
 
-func (i *IOSMessage) SetUniqueID(uniqueID string) *IOSMessage {
-	i.uniqueID = uniqueID
-	return i
-}
-
 // 可选项，自定义通知数字角标。
-func (i *IOSMessage) SetBadge(badge int64) *IOSMessage {
+func (i *Message) SetBadge(badge int64) *Message {
 	i.extra["badge"] = strconv.FormatInt(badge, 10)
 	return i
 }
 
 // 可选项，iOS8推送消息快速回复类别。
-func (i *IOSMessage) SetCategory(category string) *IOSMessage {
+func (i *Message) SetCategory(category string) *Message {
 	i.extra["category"] = category
 	return i
 }
 
 // 可选项，自定义消息铃声。
-func (i *IOSMessage) SetSoundURL(soundURL string) *IOSMessage {
+func (i *Message) SetSoundURL(soundURL string) *Message {
 	i.extra["sound_url"] = soundURL
-	return i
-}
-
-func (i *IOSMessage) SetTimeToSend(tts int64) *IOSMessage {
-	if time.Since(time.Unix(0, tts*int64(time.Millisecond))) > MaxTimeToSend {
-		i.timeToSend = time.Now().Add(MaxTimeToSend).UnixNano() / 1e6
-	} else {
-		i.timeToSend = tts
-	}
-	return i
-}
-
-func (i *IOSMessage) SetTimeToLive(ttl int64) *IOSMessage {
-	if time.Since(time.Unix(0, ttl*int64(time.Millisecond))) > MaxTimeToLive {
-		i.timeToLive = time.Now().Add(MaxTimeToLive).UnixNano() / 1e6
-	} else {
-		i.timeToLive = ttl
-	}
 	return i
 }
