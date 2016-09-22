@@ -6,12 +6,20 @@ const (
 )
 
 const (
-	RegURL           = "/v3/message/regid"          // 向某个regid或一组regid列表推送某条消息
-	MessageAllURL    = "/v3/message/all"            // 向所有设备推送某条消息
-	MultiMessagesURL = "/v2/multi_messages/regids"  // 针对不同的regid推送不同的消息
-	StatsURL         = "/v1/stats/message/counters" // 统计push
-	MessageStatusURL = "/v1/trace/message/status"   // 获取指定ID的消息状态
-	MultiTopicURL    = "v3/message/multi_topic"
+	RegURL = "/v3/message/regid" // 向某个regid或一组regid列表推送某条消息
+
+	MultiMessagesRegIDURL                = "/v2/multi_messages/regids" // 针对不同的regid推送不同的消息
+	MultiMessagesAliasURL                = "/v2/multi_messages/aliases"
+	MultiMessagesUserAccountURL          = "/v2/multi_messages/user_accounts"
+	MessageAlisaURL                      = "/v3/message/alias"          // 根据alias，发送消息到指定设备上
+	MessageUserAccountURL                = "/v2/message/user_account"   // 根据account，发送消息到指定account上
+	MultiPackageNameMessageMultiTopicURL = "/v3/message/multi_topic"    // 根据topic，发送消息到指定一组设备上
+	MessageMultiTopicURL                 = "/v2/message/multi_topic"    // 根据topic，发送消息到指定一组设备上
+	MultiPackageNameMessageAllURL        = "/v3/message/all"            // 向所有设备推送某条消息
+	MessageAllURL                        = "/v2/message/all"            // 向所有设备推送某条消息
+	StatsURL                             = "/v1/stats/message/counters" // 统计push
+	MessageStatusURL                     = "/v1/trace/message/status"   // 获取指定ID的消息状态
+	MultiTopicURL                        = "/v3/message/multi_topic"
 )
 
 // for future targeted push
