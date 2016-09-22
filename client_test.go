@@ -9,8 +9,8 @@ var packageName string = "com.xiaomi.mipushdemo"
 
 var client = NewClient("yourappSecret", []string{packageName})
 
-var msg1 *Message = NewAndroidMessage("hi baby1", "hi1").SetRestrictedPackageNames([]string{packageName}).SetPayload("this is payload1").SetPassThrough(0)
-var msg2 *Message = NewAndroidMessage("hi baby2", "hi2 ").SetRestrictedPackageNames([]string{packageName}).SetPayload("this is payload2").SetPassThrough(0)
+var msg1 *Message = NewAndroidMessage("hi baby1", "hi1").SetPayload("this is payload1").SetPassThrough(0)
+var msg2 *Message = NewAndroidMessage("hi baby2", "hi2 ").SetPayload("this is payload2").SetPassThrough(0)
 
 var regID1 string = "WFioJi0fiIco7vOrI4dnxxjeKAUqR7fjugoGkHUgxeo="
 var regID2 string = "52Pe7fPIRXWsXhzn4eYJ1njYhBhN8Lcp8IJPOMjThdk="
@@ -209,6 +209,34 @@ func TestMiPush_UnSubscribeTopicByAlias(t *testing.T) {
 	result, err := client.UnSubscribeTopicByAlias([]string{alias1, alias2}, "topic5", "")
 	if err != nil {
 		t.Errorf("TestMiPush_SubscribeTopicByAlias failed :%v\n", err)
+	}
+	t.Log("result=", result)
+}
+
+//----------------------------------------Feedback----------------------------------------//
+
+func TestMiPush_GetInvalidRegIDs(t *testing.T) {
+	result, err := client.GetInvalidRegIDs()
+	if err != nil {
+		t.Errorf("TestMiPush_GetInvalidRegIDs failed :%v\n", err)
+	}
+	t.Log("result=", result)
+}
+
+//----------------------------------------DevTools----------------------------------------//
+
+func TestMiPush_GetAliasesOfRegID(t *testing.T) {
+	result, err := client.GetAliasesOfRegID(regID1)
+	if err != nil {
+		t.Errorf("TestMiPush_GetAliasesOfRegID failed :%v\n", err)
+	}
+	t.Log("result=", result)
+}
+
+func TestMiPush_GetTopicsOfRegID(t *testing.T) {
+	result, err := client.GetTopicsOfRegID(regID2)
+	if err != nil {
+		t.Errorf("TestMiPush_GetTopicsOfRegID failed :%v\n", err)
 	}
 	t.Log("result=", result)
 }

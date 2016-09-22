@@ -127,7 +127,7 @@ func (m *MiPush) Broadcast(msg *Message, topic string) (*Result, error) {
 	params := m.assembleBroadcastParams(msg, topic)
 	var bytes []byte
 	var err error
-	if msg.IsMultiPackageName() {
+	if len(m.packageName) > 1 {
 		bytes, err = m.doPost(m.host+MultiPackageNameMessageMultiTopicURL, params)
 	} else {
 		bytes, err = m.doPost(m.host+MessageMultiTopicURL, params)
@@ -148,7 +148,7 @@ func (m *MiPush) BroadcastAll(msg *Message) (*Result, error) {
 	params := m.assembleBroadcastAllParams(msg)
 	var bytes []byte
 	var err error
-	if msg.IsMultiPackageName() {
+	if len(m.packageName) > 1 {
 		bytes, err = m.doPost(m.host+MultiPackageNameMessageAllURL, params)
 	} else {
 		bytes, err = m.doPost(m.host+MessageAllURL, params)
@@ -377,6 +377,57 @@ func (m *MiPush) UnSubscribeTopicByAlias(aliases []string, topic, category strin
 	return &result, nil
 }
 
+//----------------------------------------Feedback----------------------------------------//
+
+// 获取失效的regId列表
+// 获取失效的regId列表，每次请求最多返回1000个regId。
+// 每次请求之后，成功返回的失效的regId将会从MiPush数据库删除。
+func (m *MiPush) GetInvalidRegIDs() (*Result, error) {
+	params := m.assembleGetInvalidRegIDsParams()
+	bytes, err := m.doGet(InvalidRegIDsURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result Result
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+//----------------------------------------DevTools----------------------------------------//
+
+// 获取一个应用的某个用户目前设置的所有Alias
+func (m *MiPush) GetAliasesOfRegID(regID string) (*Result, error) {
+	params := m.assembleGetAliasesOfParams(regID)
+	bytes, err := m.doGet(m.host+AliasAllURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result Result
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// 	获取一个应用的某个用户的目前订阅的所有Topic
+func (m *MiPush) GetTopicsOfRegID(regID string) (*Result, error) {
+	params := m.assembleGetTopicsOfParams(regID)
+	bytes, err := m.doGet(m.host+TopicsAllURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result Result
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 func (m *MiPush) assembleSendParams(msg *Message, regID string) url.Values {
 	form := m.defaultForm(msg)
 	form.Add("registration_id", regID)
@@ -527,6 +578,25 @@ func (m *MiPush) assembleUnSubscribeTopicByAliasParams(aliases []string, topic, 
 	return form
 }
 
+func (m *MiPush) assembleGetInvalidRegIDsParams() string {
+	form := url.Values{}
+	return "?" + form.Encode()
+}
+
+func (m *MiPush) assembleGetAliasesOfParams(regID string) string {
+	form := url.Values{}
+	form.Add("restricted_package_name", strings.Join(m.packageName, ","))
+	form.Add("registration_id", regID)
+	return "?" + form.Encode()
+}
+
+func (m *MiPush) assembleGetTopicsOfParams(regID string) string {
+	form := url.Values{}
+	form.Add("restricted_package_name", strings.Join(m.packageName, ","))
+	form.Add("registration_id", regID)
+	return "?" + form.Encode()
+}
+
 func (m *MiPush) handleResponse(response *http.Response) ([]byte, error) {
 	defer func() {
 		_ = response.Body.Close()
@@ -603,8 +673,8 @@ func (m *MiPush) doGet(url string, params string) ([]byte, error) {
 
 func (m *MiPush) defaultForm(msg *Message) url.Values {
 	form := url.Values{}
-	if len(msg.RestrictedPackageNames) > 0 {
-		form.Add("restricted_package_name", strings.Join(msg.RestrictedPackageNames, ","))
+	if len(m.packageName) > 0 {
+		form.Add("restricted_package_name", strings.Join(m.packageName, ","))
 	}
 	if msg.TimeToLive > 0 {
 		form.Add("time_to_live", strconv.FormatInt(msg.TimeToLive, 10))

@@ -8,17 +8,16 @@ import (
 )
 
 type Message struct {
-	UniqueID               string            `json:"unique_id"`                // 消息唯一ID
-	Payload                string            `json:"payload"`                  // 消息内容payload
-	Title                  string            `json:"title"`                    // 通知栏展示的通知的标题
-	Description            string            `json:"description"`              // 通知栏展示的通知的描述
-	PassThrough            int32             `json:"pass_through"`             // 是否通过透传的方式送给app，1表示透传消息，0表示通知栏消息。
-	NotifyType             int32             `json:"notify_type"`              // DEFAULT_ALL = -1; DEFAULT_SOUND  = 1;   // 使用默认提示音提示 DEFAULT_VIBRATE = 2;   // 使用默认震动提示 DEFAULT_LIGHTS = 4;    // 使用默认led灯光提示
-	RestrictedPackageNames []string          `json:"restricted_package_names"` // 设置app的包名packageName。packageName必须和开发者网站上申请的结果一致。
-	TimeToLive             int64             `json:"time_to_live"`             // 可选项。如果用户离线，设置消息在服务器保存的时间，单位：ms。服务器默认最长保留两周。
-	TimeToSend             int64             `json:"time_to_send"`             // 可选项。定时发送消息。timeToSend是以毫秒为单位的时间戳。注：仅支持七天内的定时消息。
-	NotifyID               int64             `json:"notify_id"`                // 可选项。默认情况下，通知栏只显示一条推送消息。如果通知栏要显示多条推送消息，需要针对不同的消息设置不同的notify_id（相同notify_id的通知栏消息会覆盖之前的）。
-	Extra                  map[string]string `json:"unique_id"`                // 可选项，对app提供一些扩展的功能，请参考2.2。除了这些扩展功能，开发者还可以定义一些key和value来控制客户端的行为。注：key和value的字符数不能超过1024，至多可以设置10个key-value键值对。
+	UniqueID    string            `json:"unique_id"`    // 消息唯一ID
+	Payload     string            `json:"payload"`      // 消息内容payload
+	Title       string            `json:"title"`        // 通知栏展示的通知的标题
+	Description string            `json:"description"`  // 通知栏展示的通知的描述
+	PassThrough int32             `json:"pass_through"` // 是否通过透传的方式送给app，1表示透传消息，0表示通知栏消息。
+	NotifyType  int32             `json:"notify_type"`  // DEFAULT_ALL = -1; DEFAULT_SOUND  = 1;   // 使用默认提示音提示 DEFAULT_VIBRATE = 2;   // 使用默认震动提示 DEFAULT_LIGHTS = 4;    // 使用默认led灯光提示
+	TimeToLive  int64             `json:"time_to_live"` // 可选项。如果用户离线，设置消息在服务器保存的时间，单位：ms。服务器默认最长保留两周。
+	TimeToSend  int64             `json:"time_to_send"` // 可选项。定时发送消息。timeToSend是以毫秒为单位的时间戳。注：仅支持七天内的定时消息。
+	NotifyID    int64             `json:"notify_id"`    // 可选项。默认情况下，通知栏只显示一条推送消息。如果通知栏要显示多条推送消息，需要针对不同的消息设置不同的notify_id（相同notify_id的通知栏消息会覆盖之前的）。
+	Extra       map[string]string `json:"unique_id"`    // 可选项，对app提供一些扩展的功能，请参考2.2。除了这些扩展功能，开发者还可以定义一些key和value来控制客户端的行为。注：key和value的字符数不能超过1024，至多可以设置10个key-value键值对。
 }
 
 const (
@@ -28,17 +27,16 @@ const (
 
 func NewAndroidMessage(title, description string) *Message {
 	return &Message{
-		UniqueID:               "",
-		Payload:                "",
-		Title:                  title,
-		Description:            description,
-		PassThrough:            0,
-		NotifyType:             -1, // default notify type
-		RestrictedPackageNames: nil,
-		TimeToLive:             0,
-		TimeToSend:             0,
-		NotifyID:               0,
-		Extra:                  make(map[string]string),
+		UniqueID:    "",
+		Payload:     "",
+		Title:       title,
+		Description: description,
+		PassThrough: 0,
+		NotifyType:  -1, // default notify type
+		TimeToLive:  0,
+		TimeToSend:  0,
+		NotifyID:    0,
+		Extra:       make(map[string]string),
 	}
 }
 
@@ -60,15 +58,6 @@ func (m *Message) SetPassThrough(passThrough int32) *Message {
 func (m *Message) SetNotifyType(notifyType int32) *Message {
 	m.NotifyType = notifyType
 	return m
-}
-
-func (m *Message) SetRestrictedPackageNames(restrictedPackageNames []string) *Message {
-	m.RestrictedPackageNames = restrictedPackageNames
-	return m
-}
-
-func (m *Message) IsMultiPackageName() bool {
-	return len(m.RestrictedPackageNames) > 1
 }
 
 func (m *Message) SetTimeToSend(tts int64) *Message {
@@ -168,17 +157,16 @@ func (tm *TargetedMessage) JSON() []byte {
 // 发送给IOS设备的Message对象
 func NewIOSMessage(description string) *Message {
 	return &Message{
-		UniqueID:               "",
-		Payload:                "",
-		Title:                  "",
-		Description:            description,
-		PassThrough:            0,
-		NotifyType:             -1, // default notify type
-		RestrictedPackageNames: nil,
-		TimeToLive:             0,
-		TimeToSend:             0,
-		NotifyID:               0,
-		Extra:                  make(map[string]string),
+		UniqueID:    "",
+		Payload:     "",
+		Title:       "",
+		Description: description,
+		PassThrough: 0,
+		NotifyType:  -1, // default notify type
+		TimeToLive:  0,
+		TimeToSend:  0,
+		NotifyID:    0,
+		Extra:       make(map[string]string),
 	}
 }
 
