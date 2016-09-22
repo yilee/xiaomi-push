@@ -17,9 +17,13 @@ const (
 	MessageMultiTopicURL                 = "/v2/message/multi_topic"    // 根据topic，发送消息到指定一组设备上
 	MultiPackageNameMessageAllURL        = "/v3/message/all"            // 向所有设备推送某条消息
 	MessageAllURL                        = "/v2/message/all"            // 向所有设备推送某条消息
+	MultiTopicURL                        = "/v3/message/multi_topic"    // 向多个topic广播消息
+	ScheduleJobExistURL                  = "/v2/schedule_job/exist"     // 检测定时消息的任务是否存在。
+	ScheduleJobDeleteURL                 = "/v2/schedule_job/delete"    // 删除指定的定时消息。
+	ScheduleJobDeleteByJobKeyURL         = "/v3/schedule_job/delete"    // 删除指定的定时消息。
 	StatsURL                             = "/v1/stats/message/counters" // 统计push
 	MessageStatusURL                     = "/v1/trace/message/status"   // 获取指定ID的消息状态
-	MultiTopicURL                        = "/v3/message/multi_topic"
+	MessagesStatusURL                    = "/v1/trace/messages/status"  // 获取某个时间间隔内所有消息的状态
 )
 
 // for future targeted push

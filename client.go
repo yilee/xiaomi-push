@@ -194,8 +194,57 @@ func (m *MiPush) MultiTopicBroadcast(msg *Message, topics []string, topicOP Topi
 	return &result, nil
 }
 
-func (m *MiPush) Stats(start, end string) (*StatsResult, error) {
-	params := m.assembleStatsParams(start, end)
+// 检测定时消息的任务是否存在。
+func (m *MiPush) CheckScheduleJobExist(msgID string) (*Result, error) {
+	params := m.assembleCheckScheduleJobParams(msgID)
+	bytes, err := m.doPost(m.host+ScheduleJobExistURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result Result
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// 删除指定的定时消息
+func (m *MiPush) DeleteScheduleJob(msgID string) (*Result, error) {
+	params := m.assembleDeleteScheduleJobParams(msgID)
+	bytes, err := m.doPost(m.host+ScheduleJobDeleteURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result Result
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// 删除指定的定时消息
+func (m *MiPush) DeleteScheduleJobByJobKey(jobKey string) (*Result, error) {
+	params := m.assembleDeleteScheduleJobByJobKeyParams(jobKey)
+	bytes, err := m.doPost(m.host+ScheduleJobDeleteByJobKeyURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result Result
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// 获取指定日期范围内的日统计数据（如果日期范围包含今日，则今日数据为从今天00：00开始到现在的累计量)。
+// packageName:
+// Android设备，传入App的包名
+// IOS设备，传入App的Bundle Id
+func (m *MiPush) Stats(start, end, packageName string) (*StatsResult, error) {
+	params := m.assembleStatsParams(start, end, packageName)
 	bytes, err := m.doGet(m.host+StatsURL, params)
 	if err != nil {
 		return nil, err
@@ -208,7 +257,8 @@ func (m *MiPush) Stats(start, end string) (*StatsResult, error) {
 	return &result, nil
 }
 
-func (m *MiPush) Status(msgID string) (*StatusResult, error) {
+// 获取指定ID的消息状态
+func (m *MiPush) GetMessageStatusByMsgID(msgID string) (*StatusResult, error) {
 	params := m.assembleStatusParams(msgID)
 	bytes, err := m.doGet(m.host+MessageStatusURL, params)
 	if err != nil {
@@ -222,22 +272,34 @@ func (m *MiPush) Status(msgID string) (*StatusResult, error) {
 	return &result, nil
 }
 
-func (m *MiPush) assembleMultiTopicBroadcastParams(msg *Message, topics []string, topicOP TopicOP) url.Values {
-	form := m.defaultForm(msg)
-	form.Add("topic_op", string(topicOP))
-	form.Add("topics", strings.Join(topics, ";$;"))
-	return form
+// 获取某个时间间隔内所有消息的状态。
+func (m *MiPush) GetMessageStatusByJobKey(jobKey string) (*StatusResult, error) {
+	params := m.assembleStatusByJobKeyParams(jobKey)
+	bytes, err := m.doGet(m.host+MessagesStatusURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result StatusResult
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
-func (m *MiPush) assembleBroadcastParams(msg *Message, topic string) url.Values {
-	form := m.defaultForm(msg)
-	form.Add("topic", topic)
-	return form
-}
-
-func (m *MiPush) assembleBroadcastAllParams(msg *Message) url.Values {
-	form := m.defaultForm(msg)
-	return form
+// 获取某个时间间隔内所有消息的状态。
+func (m *MiPush) GetMessageStatusPeriod(beginTime, endTime int64) (*StatusResult, error) {
+	params := m.assembleStatusPeriodParams(beginTime, endTime)
+	bytes, err := m.doGet(m.host+MessagesStatusURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result StatusResult
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
 func (m *MiPush) assembleSendParams(msg *Message, regID string) url.Values {
@@ -283,16 +345,66 @@ func (m *MiPush) assembleSendToUserAccountParams(msg *Message, userAccount strin
 	return form
 }
 
-func (m *MiPush) assembleStatsParams(start, end string) string {
+func (m *MiPush) assembleBroadcastParams(msg *Message, topic string) url.Values {
+	form := m.defaultForm(msg)
+	form.Add("topic", topic)
+	return form
+}
+
+func (m *MiPush) assembleBroadcastAllParams(msg *Message) url.Values {
+	form := m.defaultForm(msg)
+	return form
+}
+
+func (m *MiPush) assembleMultiTopicBroadcastParams(msg *Message, topics []string, topicOP TopicOP) url.Values {
+	form := m.defaultForm(msg)
+	form.Add("topic_op", string(topicOP))
+	form.Add("topics", strings.Join(topics, ";$;"))
+	return form
+}
+
+func (m *MiPush) assembleCheckScheduleJobParams(msgID string) url.Values {
+	form := url.Values{}
+	form.Add("job_id", msgID)
+	return form
+}
+
+func (m *MiPush) assembleDeleteScheduleJobParams(msgID string) url.Values {
+	form := url.Values{}
+	form.Add("job_id", msgID)
+	return form
+}
+
+func (m *MiPush) assembleDeleteScheduleJobByJobKeyParams(jobKey string) url.Values {
+	form := url.Values{}
+	form.Add("job_key", jobKey)
+	return form
+}
+
+func (m *MiPush) assembleStatsParams(start, end, packageName string) string {
 	form := url.Values{}
 	form.Add("start_date", start)
 	form.Add("end_date", end)
+	form.Add("restricted_package_name", packageName)
 	return "?" + form.Encode()
 }
 
 func (m *MiPush) assembleStatusParams(msgID string) string {
 	form := url.Values{}
 	form.Add("msg_id", msgID)
+	return "?" + form.Encode()
+}
+
+func (m *MiPush) assembleStatusByJobKeyParams(jobKey string) string {
+	form := url.Values{}
+	form.Add("job_key", jobKey)
+	return "?" + form.Encode()
+}
+
+func (m *MiPush) assembleStatusPeriodParams(beginTime, endTime int64) string {
+	form := url.Values{}
+	form.Add("begin_time", strconv.FormatInt(int64(beginTime), 10))
+	form.Add("end_time", strconv.FormatInt(int64(endTime), 10))
 	return "?" + form.Encode()
 }
 
@@ -366,6 +478,7 @@ func (m *MiPush) doGet(url string, params string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("get result=", string(result))
 	return result, nil
 }
 
