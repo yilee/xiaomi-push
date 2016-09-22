@@ -1,28 +1,61 @@
 # xiaomi-push
 小米推送服务 Golang SDK
 
+full golang implementation of XiaoMi Push API (http://dev.xiaomi.com/console/?page=appservice&mod=push)
 
 ```Go
 import (
-	"fmt"
+    "fmt"
 
-	xm "github.com/yilee/xiaomi-push"
+    xm "github.com/yilee/xiaomi-push"
 )
 
-var client = xm.NewClient("appSecret", "packageName")
+var client = xm.NewClient("yourappSecret", []string{"packageName"})
 
 func main() {
-	msg := xm.NewMessage("hi baby")
-	result, err := client.Push(msg, []string{"fake_reg_id_1", "fake_reg_id_2"})
-	fmt.Println("result1, err1", result, err)
-
-
-	result2, err := client.Stats("20160901","20160902")
-	fmt.Println("result2, err", result2, err)
-
-	result3, err := client.Status("Xlm35b23474365994495Hu")
-	fmt.Println("result3, err", result3, err)
-
+    var msg1 *Message = NewAndroidMessage("hi baby1", "hi1").SetPayload("this is payload1").SetPassThrough(0)
+    client.Send(msg1, regID1)
 }
 
 ```
+
+### Sender APIs
+
+- [x] Send(msg *Message, regID string)
+- [x] SendToList(msg *Message, regIDList []string)
+- [ ] SendTargetMessageList(msgList []*TargetedMessage)
+- [x] SendToAlias(msg *Message, alias string)
+- [x] SendToAliasList(msg *Message, aliasList []string)
+- [x] SendToUserAccount(msg *Message, userAccount string) 
+- [x] SendToUserAccountList(msg *Message, accountList []string)
+- [ ] Broadcast(msg *Message, topic string)
+- [x] BroadcastAll(msg *Message) (*SendResult, error)
+- [x] MultiTopicBroadcast(msg *Message, topics []string, topicOP TopicOP)
+- [x] CheckScheduleJobExist(msgID string)
+- [x] DeleteScheduleJob(msgID string) (*Result, error)
+- [x] DeleteScheduleJobByJobKey(jobKey string) (*Result, error) 
+
+### Stats APIs
+
+- [x] Stats(start, end, packageName string)
+- [x] GetMessageStatusByMsgID(msgID string) (*SingleStatusResult, error)
+- [x] GetMessageStatusByJobKey(jobKey string) (*BatchStatusResult, error) 
+- [x] GetMessageStatusPeriod(beginTime, endTime int64) (*BatchStatusResult, error) 
+
+### Subscription APIs
+
+- [x] SubscribeTopicForRegID(regID, topic, category string) (*Result, error)
+- [x] SubscribeTopicForRegIDList(regIDList []string, topic, category string) (*Result, error)
+- [x] UnSubscribeTopicForRegID(regID, topic, category string) (*Result, error)
+- [x] UnSubscribeTopicForRegIDList(regIDList []string, topic, category string) (*Result, error)
+- [x] SubscribeTopicByAlias(aliases []string, topic, category string) (*Result, error)
+- [x] UnSubscribeTopicByAlias(aliases []string, topic, category string) (*Result, error)
+
+### Feedback APIs
+
+- [x] GetInvalidRegIDs() (*InvalidRegIDsResult, error)
+
+### DevTools APIs
+
+- [x] GetAliasesOfRegID(regID string) (*AliasesOfRegIDResult, error)
+- [x] GetTopicsOfRegID(regID string) (*TopicsOfRegIDResult, error)

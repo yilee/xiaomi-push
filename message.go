@@ -93,6 +93,15 @@ func (m *Message) DisableFlowControl() *Message {
 	return m
 }
 
+// 开发者在发送消息时可以设置消息的组ID（JobKey），带有相同的组ID的消息会被聚合为一个消息组。
+// 系统支持按照消息组展示消息详情以及计划推送／送达数量／送达曲线等统计信息。
+// 另外，相同JobKey的消息在客户端会进行去重，只展示其中的第一条。
+// 这样如果发送时同JobKey中不慎有重复的设备也不用担心用户会收到重复的通知。
+func (m *Message) SetJobKey(jobKey string) *Message {
+	m.Extra["jobkey"] = jobKey
+	return m
+}
+
 // 小米推送服务器每隔1s将已送达或已点击的消息ID和对应设备的regid或alias通过调用第三方http接口传给开发者。
 func (m *Message) SetCallback(callbackURL string) *Message {
 	m.Extra["callback"] = callbackURL

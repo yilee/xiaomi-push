@@ -29,7 +29,7 @@ func TestMiPush_Send(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_Send failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_SendToList(t *testing.T) {
@@ -37,7 +37,7 @@ func TestMiPush_SendToList(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_SendToList failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 // Not Finished
@@ -47,7 +47,7 @@ func TestMiPush_SendTargetMessageList(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_SendTargetMessageList failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_SendToAlias(t *testing.T) {
@@ -55,7 +55,7 @@ func TestMiPush_SendToAlias(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_SendToAlias failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_SendToAliasList(t *testing.T) {
@@ -63,7 +63,7 @@ func TestMiPush_SendToAliasList(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_SendToAliasList failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_SendToUserAccount(t *testing.T) {
@@ -71,7 +71,7 @@ func TestMiPush_SendToUserAccount(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_SendToUserAccount failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_SendToUserAccountList(t *testing.T) {
@@ -79,7 +79,7 @@ func TestMiPush_SendToUserAccountList(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_SendToUserAccountList failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 // Not Finished
@@ -88,7 +88,7 @@ func TestMiPush_Broadcast(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_Broadcast failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_BroadcastAll(t *testing.T) {
@@ -96,7 +96,7 @@ func TestMiPush_BroadcastAll(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_BroadcastAll failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_MultiTopicBroadcast(t *testing.T) {
@@ -104,23 +104,23 @@ func TestMiPush_MultiTopicBroadcast(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_MultiTopicBroadcast failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_CheckScheduleJobExist(t *testing.T) {
-	result, err := client.CheckScheduleJobExist("Xcm45b21474513716292EL")
+	result, err := client.CheckScheduleJobExist("slm30b80474526081454i5")
 	if err != nil {
 		t.Errorf("TestMiPush_CheckScheduleJobExist failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_DeleteScheduleJob(t *testing.T) {
-	result, err := client.DeleteScheduleJob("Xcm45b21474513716292EL")
+	result, err := client.DeleteScheduleJob("slm30b80474526081454i5")
 	if err != nil {
 		t.Errorf("TestMiPush_DeleteScheduleJob failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_DeleteScheduleJobByJobKey(t *testing.T) {
@@ -128,31 +128,31 @@ func TestMiPush_DeleteScheduleJobByJobKey(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_DeleteScheduleJobByJobKey failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_Stats(t *testing.T) {
-	result, err := client.Stats("20160921", "20160922", packageName)
+	result, err := client.Stats("20160922", "20160922", packageName)
 	if err != nil {
 		t.Errorf("TestMiPush_Stats failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_GetMessageStatusByMsgID(t *testing.T) {
-	result, err := client.GetMessageStatusByMsgID("Xcm49b95474515503850Sn")
+	result, err := client.GetMessageStatusByMsgID("scm23b964745244861922w")
 	if err != nil {
 		t.Errorf("TestMiPush_GetMessageStatusByMsgID failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_GetMessageStatusByJobKey(t *testing.T) {
-	result, err := client.GetMessageStatusByMsgID("xxxxx")
+	result, err := client.GetMessageStatusByJobKey("key111")
 	if err != nil {
 		t.Errorf("TestMiPush_GetMessageStatusByJobKey failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_GetMessageStatusPeriod(t *testing.T) {
@@ -160,7 +160,7 @@ func TestMiPush_GetMessageStatusPeriod(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_GetMessageStatusPeriod failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 //----------------------------------------Subscription----------------------------------------//
@@ -170,7 +170,7 @@ func TestMiPush_SubscribeTopicForRegID(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_SubscribeTopicForRegID failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_SubscribeTopicForRegIDList(t *testing.T) {
@@ -178,7 +178,7 @@ func TestMiPush_SubscribeTopicForRegIDList(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_SubscribeTopicForRegIDList failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_UnSubscribeTopicForRegID(t *testing.T) {
@@ -186,7 +186,7 @@ func TestMiPush_UnSubscribeTopicForRegID(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_UnSubscribeTopicForRegID failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_UnSubscribeTopicForRegIDList(t *testing.T) {
@@ -194,7 +194,7 @@ func TestMiPush_UnSubscribeTopicForRegIDList(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_SubscribeTopicForRegIDList failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_SubscribeTopicByAlias(t *testing.T) {
@@ -202,7 +202,7 @@ func TestMiPush_SubscribeTopicByAlias(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_SubscribeTopicByAlias failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_UnSubscribeTopicByAlias(t *testing.T) {
@@ -210,7 +210,7 @@ func TestMiPush_UnSubscribeTopicByAlias(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_SubscribeTopicByAlias failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 //----------------------------------------Feedback----------------------------------------//
@@ -220,7 +220,7 @@ func TestMiPush_GetInvalidRegIDs(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_GetInvalidRegIDs failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 //----------------------------------------DevTools----------------------------------------//
@@ -230,7 +230,7 @@ func TestMiPush_GetAliasesOfRegID(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_GetAliasesOfRegID failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }
 
 func TestMiPush_GetTopicsOfRegID(t *testing.T) {
@@ -238,5 +238,5 @@ func TestMiPush_GetTopicsOfRegID(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestMiPush_GetTopicsOfRegID failed :%v\n", err)
 	}
-	t.Log("result=", result)
+	t.Logf("result=%#v\n", result)
 }

@@ -3,7 +3,6 @@ package xiaomipush
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -27,13 +26,13 @@ func NewClient(appSecret string, packageName []string) *MiPush {
 
 //----------------------------------------Sender----------------------------------------//
 // 根据registrationId，发送消息到指定设备上
-func (m *MiPush) Send(msg *Message, regID string) (*Result, error) {
+func (m *MiPush) Send(msg *Message, regID string) (*SendResult, error) {
 	params := m.assembleSendParams(msg, regID)
 	bytes, err := m.doPost(m.host+RegURL, params)
 	if err != nil {
 		return nil, err
 	}
-	var result Result
+	var result SendResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -43,13 +42,13 @@ func (m *MiPush) Send(msg *Message, regID string) (*Result, error) {
 
 // 根据regIds，发送消息到指定的一组设备上
 // regIds的个数不得超过1000个。
-func (m *MiPush) SendToList(msg *Message, regIDList []string) (*Result, error) {
+func (m *MiPush) SendToList(msg *Message, regIDList []string) (*SendResult, error) {
 	return m.Send(msg, strings.Join(regIDList, ","))
 }
 
 // 发送一组消息。其中TargetedMessage类中封装了Message对象和该Message所要发送的目标。注意：messages内所有TargetedMessage对象的targetType必须相同，
 // 不支持在一个调用中同时给regid和alias发送消息。
-func (m *MiPush) SendTargetMessageList(msgList []*TargetedMessage) (*Result, error) {
+func (m *MiPush) SendTargetMessageList(msgList []*TargetedMessage) (*SendResult, error) {
 	if len(msgList) == 0 {
 		return nil, errors.New("empty msg")
 	}
@@ -72,7 +71,7 @@ func (m *MiPush) SendTargetMessageList(msgList []*TargetedMessage) (*Result, err
 	if err != nil {
 		return nil, err
 	}
-	var result Result
+	var result SendResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -81,13 +80,13 @@ func (m *MiPush) SendTargetMessageList(msgList []*TargetedMessage) (*Result, err
 }
 
 // 根据alias，发送消息到指定设备上
-func (m *MiPush) SendToAlias(msg *Message, alias string) (*Result, error) {
+func (m *MiPush) SendToAlias(msg *Message, alias string) (*SendResult, error) {
 	params := m.assembleSendToAlisaParams(msg, alias)
 	bytes, err := m.doPost(m.host+MessageAlisaURL, params)
 	if err != nil {
 		return nil, err
 	}
-	var result Result
+	var result SendResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -97,18 +96,18 @@ func (m *MiPush) SendToAlias(msg *Message, alias string) (*Result, error) {
 
 // 根据aliasList，发送消息到指定的一组设备上
 // 元素的个数不得超过1000个。
-func (m *MiPush) SendToAliasList(msg *Message, aliasList []string) (*Result, error) {
+func (m *MiPush) SendToAliasList(msg *Message, aliasList []string) (*SendResult, error) {
 	return m.SendToAlias(msg, strings.Join(aliasList, ","))
 }
 
 // 根据account，发送消息到指定account上
-func (m *MiPush) SendToUserAccount(msg *Message, userAccount string) (*Result, error) {
+func (m *MiPush) SendToUserAccount(msg *Message, userAccount string) (*SendResult, error) {
 	params := m.assembleSendToUserAccountParams(msg, userAccount)
 	bytes, err := m.doPost(m.host+MessageUserAccountURL, params)
 	if err != nil {
 		return nil, err
 	}
-	var result Result
+	var result SendResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -118,12 +117,12 @@ func (m *MiPush) SendToUserAccount(msg *Message, userAccount string) (*Result, e
 
 // 根据accountList，发送消息到指定的一组设备上
 // 元素的个数不得超过1000个。
-func (m *MiPush) SendToUserAccountList(msg *Message, accountList []string) (*Result, error) {
+func (m *MiPush) SendToUserAccountList(msg *Message, accountList []string) (*SendResult, error) {
 	return m.SendToUserAccount(msg, strings.Join(accountList, ","))
 }
 
 // 根据topic，发送消息到指定一组设备上
-func (m *MiPush) Broadcast(msg *Message, topic string) (*Result, error) {
+func (m *MiPush) Broadcast(msg *Message, topic string) (*SendResult, error) {
 	params := m.assembleBroadcastParams(msg, topic)
 	var bytes []byte
 	var err error
@@ -135,7 +134,7 @@ func (m *MiPush) Broadcast(msg *Message, topic string) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	var result Result
+	var result SendResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -144,7 +143,7 @@ func (m *MiPush) Broadcast(msg *Message, topic string) (*Result, error) {
 }
 
 // 向所有设备发送消息
-func (m *MiPush) BroadcastAll(msg *Message) (*Result, error) {
+func (m *MiPush) BroadcastAll(msg *Message) (*SendResult, error) {
 	params := m.assembleBroadcastAllParams(msg)
 	var bytes []byte
 	var err error
@@ -156,7 +155,7 @@ func (m *MiPush) BroadcastAll(msg *Message) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	var result Result
+	var result SendResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -175,7 +174,7 @@ const (
 // 向多个topic广播消息，支持topic间的交集、并集或差集（如果只有一个topic请用单topic版本）
 // TOPIC_OP是一个枚举类型，指定了发送广播消息时多个topic之间的运算关系。
 // 例如：topics的列表元素是[A, B, C, D]，则并集结果是A∪B∪C∪D，交集的结果是A∩B∩C∩D，差集的结果是A-B-C-D
-func (m *MiPush) MultiTopicBroadcast(msg *Message, topics []string, topicOP TopicOP) (*Result, error) {
+func (m *MiPush) MultiTopicBroadcast(msg *Message, topics []string, topicOP TopicOP) (*SendResult, error) {
 	if len(topics) > 5 || len(topics) == 0 {
 		panic("topics size invalid")
 	}
@@ -187,7 +186,7 @@ func (m *MiPush) MultiTopicBroadcast(msg *Message, topics []string, topicOP Topi
 	if err != nil {
 		return nil, err
 	}
-	var result Result
+	var result SendResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -196,6 +195,7 @@ func (m *MiPush) MultiTopicBroadcast(msg *Message, topics []string, topicOP Topi
 }
 
 // 检测定时消息的任务是否存在。
+// result.code = 0 为任务存在, 否则不存在
 func (m *MiPush) CheckScheduleJobExist(msgID string) (*Result, error) {
 	params := m.assembleCheckScheduleJobParams(msgID)
 	bytes, err := m.doPost(m.host+ScheduleJobExistURL, params)
@@ -261,13 +261,13 @@ func (m *MiPush) Stats(start, end, packageName string) (*StatsResult, error) {
 
 //----------------------------------------Tracer----------------------------------------//
 // 获取指定ID的消息状态
-func (m *MiPush) GetMessageStatusByMsgID(msgID string) (*StatusResult, error) {
+func (m *MiPush) GetMessageStatusByMsgID(msgID string) (*SingleStatusResult, error) {
 	params := m.assembleStatusParams(msgID)
 	bytes, err := m.doGet(m.host+MessageStatusURL, params)
 	if err != nil {
 		return nil, err
 	}
-	var result StatusResult
+	var result SingleStatusResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -276,13 +276,13 @@ func (m *MiPush) GetMessageStatusByMsgID(msgID string) (*StatusResult, error) {
 }
 
 // 获取某个时间间隔内所有消息的状态。
-func (m *MiPush) GetMessageStatusByJobKey(jobKey string) (*StatusResult, error) {
+func (m *MiPush) GetMessageStatusByJobKey(jobKey string) (*BatchStatusResult, error) {
 	params := m.assembleStatusByJobKeyParams(jobKey)
 	bytes, err := m.doGet(m.host+MessagesStatusURL, params)
 	if err != nil {
 		return nil, err
 	}
-	var result StatusResult
+	var result BatchStatusResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -291,13 +291,13 @@ func (m *MiPush) GetMessageStatusByJobKey(jobKey string) (*StatusResult, error) 
 }
 
 // 获取某个时间间隔内所有消息的状态。
-func (m *MiPush) GetMessageStatusPeriod(beginTime, endTime int64) (*StatusResult, error) {
+func (m *MiPush) GetMessageStatusPeriod(beginTime, endTime int64) (*BatchStatusResult, error) {
 	params := m.assembleStatusPeriodParams(beginTime, endTime)
 	bytes, err := m.doGet(m.host+MessagesStatusURL, params)
 	if err != nil {
 		return nil, err
 	}
-	var result StatusResult
+	var result BatchStatusResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -382,13 +382,13 @@ func (m *MiPush) UnSubscribeTopicByAlias(aliases []string, topic, category strin
 // 获取失效的regId列表
 // 获取失效的regId列表，每次请求最多返回1000个regId。
 // 每次请求之后，成功返回的失效的regId将会从MiPush数据库删除。
-func (m *MiPush) GetInvalidRegIDs() (*Result, error) {
+func (m *MiPush) GetInvalidRegIDs() (*InvalidRegIDsResult, error) {
 	params := m.assembleGetInvalidRegIDsParams()
 	bytes, err := m.doGet(InvalidRegIDsURL, params)
 	if err != nil {
 		return nil, err
 	}
-	var result Result
+	var result InvalidRegIDsResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -399,13 +399,13 @@ func (m *MiPush) GetInvalidRegIDs() (*Result, error) {
 //----------------------------------------DevTools----------------------------------------//
 
 // 获取一个应用的某个用户目前设置的所有Alias
-func (m *MiPush) GetAliasesOfRegID(regID string) (*Result, error) {
+func (m *MiPush) GetAliasesOfRegID(regID string) (*AliasesOfRegIDResult, error) {
 	params := m.assembleGetAliasesOfParams(regID)
 	bytes, err := m.doGet(m.host+AliasAllURL, params)
 	if err != nil {
 		return nil, err
 	}
-	var result Result
+	var result AliasesOfRegIDResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -414,13 +414,13 @@ func (m *MiPush) GetAliasesOfRegID(regID string) (*Result, error) {
 }
 
 // 	获取一个应用的某个用户的目前订阅的所有Topic
-func (m *MiPush) GetTopicsOfRegID(regID string) (*Result, error) {
+func (m *MiPush) GetTopicsOfRegID(regID string) (*TopicsOfRegIDResult, error) {
 	params := m.assembleGetTopicsOfParams(regID)
 	bytes, err := m.doGet(m.host+TopicsAllURL, params)
 	if err != nil {
 		return nil, err
 	}
-	var result Result
+	var result TopicsOfRegIDResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -454,7 +454,6 @@ func (m *MiPush) assembleTargetMessageListParams(msgList []*TargetedMessage) str
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("bytes", string(bytes))
 	form.Add("messages", string(bytes))
 	return string(bytes)
 }
@@ -625,6 +624,9 @@ func (m *MiPush) doPost(url string, form url.Values) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("network error")
+	}
 	return result, nil
 }
 
@@ -633,7 +635,6 @@ func (m *MiPush) doPost2(url string, jsonStr string) ([]byte, error) {
 	var req *http.Request
 	var resp *http.Response
 	var err error
-	fmt.Println("jsonStr", jsonStr)
 	req, err = http.NewRequest("POST", url, strings.NewReader(jsonStr))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
 	req.Header.Set("Authorization", "key="+m.appSecret)
@@ -667,7 +668,6 @@ func (m *MiPush) doGet(url string, params string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("get result=", string(result))
 	return result, nil
 }
 
