@@ -7,7 +7,7 @@ import (
 
 var packageName string = "com.xiaomi.mipushdemo"
 
-var client = NewClient("yourappSecret", packageName)
+var client = NewClient("yourappSecret", []string{packageName})
 
 var msg1 *Message = NewAndroidMessage("hi baby1", "hi1").SetRestrictedPackageNames([]string{packageName}).SetPayload("this is payload1").SetPassThrough(0)
 var msg2 *Message = NewAndroidMessage("hi baby2", "hi2 ").SetRestrictedPackageNames([]string{packageName}).SetPayload("this is payload2").SetPassThrough(0)
@@ -159,6 +159,56 @@ func TestMiPush_GetMessageStatusPeriod(t *testing.T) {
 	result, err := client.GetMessageStatusPeriod(time.Now().Add(-time.Hour*24).Unix()*1000, time.Now().Unix()*1000)
 	if err != nil {
 		t.Errorf("TestMiPush_GetMessageStatusPeriod failed :%v\n", err)
+	}
+	t.Log("result=", result)
+}
+
+//----------------------------------------Subscription----------------------------------------//
+
+func TestMiPush_SubscribeTopicForRegID(t *testing.T) {
+	result, err := client.SubscribeTopicForRegID(regID1, "topic3", "")
+	if err != nil {
+		t.Errorf("TestMiPush_SubscribeTopicForRegID failed :%v\n", err)
+	}
+	t.Log("result=", result)
+}
+
+func TestMiPush_SubscribeTopicForRegIDList(t *testing.T) {
+	result, err := client.SubscribeTopicForRegIDList([]string{regID1, regID2}, "topic5", "")
+	if err != nil {
+		t.Errorf("TestMiPush_SubscribeTopicForRegIDList failed :%v\n", err)
+	}
+	t.Log("result=", result)
+}
+
+func TestMiPush_UnSubscribeTopicForRegID(t *testing.T) {
+	result, err := client.UnSubscribeTopicForRegID(regID1, "topic3", "")
+	if err != nil {
+		t.Errorf("TestMiPush_UnSubscribeTopicForRegID failed :%v\n", err)
+	}
+	t.Log("result=", result)
+}
+
+func TestMiPush_UnSubscribeTopicForRegIDList(t *testing.T) {
+	result, err := client.UnSubscribeTopicForRegIDList([]string{regID1, regID2}, "topic5", "")
+	if err != nil {
+		t.Errorf("TestMiPush_SubscribeTopicForRegIDList failed :%v\n", err)
+	}
+	t.Log("result=", result)
+}
+
+func TestMiPush_SubscribeTopicByAlias(t *testing.T) {
+	result, err := client.SubscribeTopicByAlias([]string{alias1, alias2}, "topic5", "")
+	if err != nil {
+		t.Errorf("TestMiPush_SubscribeTopicByAlias failed :%v\n", err)
+	}
+	t.Log("result=", result)
+}
+
+func TestMiPush_UnSubscribeTopicByAlias(t *testing.T) {
+	result, err := client.UnSubscribeTopicByAlias([]string{alias1, alias2}, "topic5", "")
+	if err != nil {
+		t.Errorf("TestMiPush_SubscribeTopicByAlias failed :%v\n", err)
 	}
 	t.Log("result=", result)
 }

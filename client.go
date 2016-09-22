@@ -12,12 +12,12 @@ import (
 )
 
 type MiPush struct {
-	packageName string
+	packageName []string
 	host        string
 	appSecret   string
 }
 
-func NewClient(appSecret, packageName string) *MiPush {
+func NewClient(appSecret string, packageName []string) *MiPush {
 	return &MiPush{
 		packageName: packageName,
 		host:        ProductionHost,
@@ -25,6 +25,7 @@ func NewClient(appSecret, packageName string) *MiPush {
 	}
 }
 
+//----------------------------------------Sender----------------------------------------//
 // 根据registrationId，发送消息到指定设备上
 func (m *MiPush) Send(msg *Message, regID string) (*Result, error) {
 	params := m.assembleSendParams(msg, regID)
@@ -239,6 +240,7 @@ func (m *MiPush) DeleteScheduleJobByJobKey(jobKey string) (*Result, error) {
 	return &result, nil
 }
 
+//----------------------------------------Stats----------------------------------------//
 // 获取指定日期范围内的日统计数据（如果日期范围包含今日，则今日数据为从今天00：00开始到现在的累计量)。
 // packageName:
 // Android设备，传入App的包名
@@ -257,6 +259,7 @@ func (m *MiPush) Stats(start, end, packageName string) (*StatsResult, error) {
 	return &result, nil
 }
 
+//----------------------------------------Tracer----------------------------------------//
 // 获取指定ID的消息状态
 func (m *MiPush) GetMessageStatusByMsgID(msgID string) (*StatusResult, error) {
 	params := m.assembleStatusParams(msgID)
@@ -295,6 +298,78 @@ func (m *MiPush) GetMessageStatusPeriod(beginTime, endTime int64) (*StatusResult
 		return nil, err
 	}
 	var result StatusResult
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+//----------------------------------------Subscription----------------------------------------//
+
+// 给某个regid订阅标签
+func (m *MiPush) SubscribeTopicForRegID(regID, topic, category string) (*Result, error) {
+	params := m.assembleSubscribeTopicForRegIDParams(regID, topic, category)
+	bytes, err := m.doPost(m.host+TopicSubscribeURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result Result
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// 给一组regid列表订阅标签
+func (m *MiPush) SubscribeTopicForRegIDList(regIDList []string, topic, category string) (*Result, error) {
+	return m.SubscribeTopicForRegID(strings.Join(regIDList, ","), topic, category)
+}
+
+// 取消某个regid的标签。
+func (m *MiPush) UnSubscribeTopicForRegID(regID, topic, category string) (*Result, error) {
+	params := m.assembleUnSubscribeTopicForRegIDParams(regID, topic, category)
+	bytes, err := m.doPost(m.host+TopicUnSubscribeURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result Result
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// 取消一组regid列表的标签
+func (m *MiPush) UnSubscribeTopicForRegIDList(regIDList []string, topic, category string) (*Result, error) {
+	return m.UnSubscribeTopicForRegID(strings.Join(regIDList, ","), topic, category)
+}
+
+// 给一组alias列表订阅标签
+func (m *MiPush) SubscribeTopicByAlias(aliases []string, topic, category string) (*Result, error) {
+	params := m.assembleSubscribeTopicByAliasParams(aliases, topic, category)
+	bytes, err := m.doPost(m.host+TopicSubscribeByAliasURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result Result
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// 取消一组alias列表的标签
+func (m *MiPush) UnSubscribeTopicByAlias(aliases []string, topic, category string) (*Result, error) {
+	params := m.assembleUnSubscribeTopicByAliasParams(aliases, topic, category)
+	bytes, err := m.doPost(m.host+TopicUnSubscribeByAliasURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result Result
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
 		return nil, err
@@ -406,6 +481,50 @@ func (m *MiPush) assembleStatusPeriodParams(beginTime, endTime int64) string {
 	form.Add("begin_time", strconv.FormatInt(int64(beginTime), 10))
 	form.Add("end_time", strconv.FormatInt(int64(endTime), 10))
 	return "?" + form.Encode()
+}
+
+func (m *MiPush) assembleSubscribeTopicForRegIDParams(regID, topic, category string) url.Values {
+	form := url.Values{}
+	form.Add("registration_id", regID)
+	form.Add("topic", topic)
+	form.Add("restricted_package_name", strings.Join(m.packageName, ","))
+	if category != "" {
+		form.Add("category", category)
+	}
+	return form
+}
+
+func (m *MiPush) assembleUnSubscribeTopicForRegIDParams(regID, topic, category string) url.Values {
+	form := url.Values{}
+	form.Add("registration_id", regID)
+	form.Add("topic", topic)
+	form.Add("restricted_package_name", strings.Join(m.packageName, ","))
+	if category != "" {
+		form.Add("category", category)
+	}
+	return form
+}
+
+func (m *MiPush) assembleSubscribeTopicByAliasParams(aliases []string, topic, category string) url.Values {
+	form := url.Values{}
+	form.Add("aliases", strings.Join(aliases, ","))
+	form.Add("topic", topic)
+	form.Add("restricted_package_name", strings.Join(m.packageName, ","))
+	if category != "" {
+		form.Add("category", category)
+	}
+	return form
+}
+
+func (m *MiPush) assembleUnSubscribeTopicByAliasParams(aliases []string, topic, category string) url.Values {
+	form := url.Values{}
+	form.Add("aliases", strings.Join(aliases, ","))
+	form.Add("topic", topic)
+	form.Add("restricted_package_name", strings.Join(m.packageName, ","))
+	if category != "" {
+		form.Add("category", category)
+	}
+	return form
 }
 
 func (m *MiPush) handleResponse(response *http.Response) ([]byte, error) {

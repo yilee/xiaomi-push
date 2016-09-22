@@ -26,6 +26,13 @@ const (
 	MessagesStatusURL                    = "/v1/trace/messages/status"  // 获取某个时间间隔内所有消息的状态
 )
 
+const (
+	TopicSubscribeURL          = "/v2/topic/subscribe"         // 给某个regid订阅标签。
+	TopicUnSubscribeURL        = "/v2/topic/unsubscribe"       // 取消某个regid的标签。
+	TopicSubscribeByAliasURL   = "/v2/topic/subscribe/alias"   // 给一组alias列表订阅标签
+	TopicUnSubscribeByAliasURL = "/v2/topic/unsubscribe/alias" // 取消一组alias列表的标签
+)
+
 // for future targeted push
 var (
 	BrandsMap = map[string]string{
