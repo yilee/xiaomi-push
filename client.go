@@ -59,11 +59,11 @@ func (m *MiPush) SendTargetMessageList(msgList []*TargetedMessage) (*SendResult,
 	var bytes []byte
 	var err error
 	if msgList[0].targetType == TargetTypeRegID {
-		bytes, err = m.doPost2(m.host+MultiMessagesRegIDURL, params)
+		bytes, err = m.doPost(m.host+MultiMessagesRegIDURL, params)
 	} else if msgList[0].targetType == TargetTypeReAlias {
-		bytes, err = m.doPost2(m.host+MultiMessagesAliasURL, params)
+		bytes, err = m.doPost(m.host+MultiMessagesAliasURL, params)
 	} else if msgList[0].targetType == TargetTypeAccount {
-		bytes, err = m.doPost2(m.host+MultiMessagesUserAccountURL, params)
+		bytes, err = m.doPost(m.host+MultiMessagesUserAccountURL, params)
 	} else {
 		panic("bad targetType")
 	}
@@ -434,7 +434,7 @@ func (m *MiPush) assembleSendParams(msg *Message, regID string) url.Values {
 	return form
 }
 
-func (m *MiPush) assembleTargetMessageListParams(msgList []*TargetedMessage) string {
+func (m *MiPush) assembleTargetMessageListParams(msgList []*TargetedMessage) url.Values {
 	form := url.Values{}
 	type OneMsg struct {
 		Target  string `json:"target"`
@@ -455,7 +455,7 @@ func (m *MiPush) assembleTargetMessageListParams(msgList []*TargetedMessage) str
 		panic(err)
 	}
 	form.Add("messages", string(bytes))
-	return string(bytes)
+	return form
 }
 
 func (m *MiPush) assembleSendToAlisaParams(msg *Message, alias string) url.Values {
@@ -626,26 +626,6 @@ func (m *MiPush) doPost(url string, form url.Values) ([]byte, error) {
 	}
 	if resp.StatusCode != http.StatusOK {
 		return nil, errors.New("network error")
-	}
-	return result, nil
-}
-
-func (m *MiPush) doPost2(url string, jsonStr string) ([]byte, error) {
-	var result []byte
-	var req *http.Request
-	var resp *http.Response
-	var err error
-	req, err = http.NewRequest("POST", url, strings.NewReader(jsonStr))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
-	req.Header.Set("Authorization", "key="+m.appSecret)
-	client := &http.Client{}
-	resp, err = client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	result, err = m.handleResponse(resp)
-	if err != nil {
-		return nil, err
 	}
 	return result, nil
 }

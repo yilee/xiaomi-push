@@ -13,7 +13,7 @@ const (
 	MessageAlisaURL                      = "/v3/message/alias"                // 根据alias，发送消息到指定设备上
 	MessageUserAccountURL                = "/v2/message/user_account"         // 根据account，发送消息到指定account上
 	MultiPackageNameMessageMultiTopicURL = "/v3/message/multi_topic"          // 根据topic，发送消息到指定一组设备上
-	MessageMultiTopicURL                 = "/v2/message/multi_topic"          // 根据topic，发送消息到指定一组设备上
+	MessageMultiTopicURL                 = "/v2/message/topic"                // 根据topic，发送消息到指定一组设备上
 	MultiPackageNameMessageAllURL        = "/v3/message/all"                  // 向所有设备推送某条消息
 	MessageAllURL                        = "/v2/message/all"                  // 向所有设备推送某条消息
 	MultiTopicURL                        = "/v3/message/multi_topic"          // 向多个topic广播消息

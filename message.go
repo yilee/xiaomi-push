@@ -2,7 +2,6 @@ package xiaomipush
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"time"
 )
@@ -24,21 +23,6 @@ const (
 	MaxTimeToSend = time.Hour * 24 * 7
 	MaxTimeToLive = time.Hour * 24 * 7 * 2
 )
-
-func NewAndroidMessage(title, description string) *Message {
-	return &Message{
-		UniqueID:    "",
-		Payload:     "",
-		Title:       title,
-		Description: description,
-		PassThrough: 0,
-		NotifyType:  -1, // default notify type
-		TimeToLive:  0,
-		TimeToSend:  0,
-		NotifyID:    0,
-		Extra:       make(map[string]string),
-	}
-}
 
 func (m *Message) SetUniqueID(uniqueID string) *Message {
 	m.UniqueID = uniqueID
@@ -115,8 +99,59 @@ func (m *Message) JSON() []byte {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("m", string(bytes))
 	return bytes
+}
+
+//-----------------------------------------------------------------------------------//
+// 发送给Android设备的Message对象
+func NewAndroidMessage(title, description string) *Message {
+	return &Message{
+		UniqueID:    "",
+		Payload:     "",
+		Title:       title,
+		Description: description,
+		PassThrough: 0,
+		NotifyType:  -1, // default notify type
+		TimeToLive:  0,
+		TimeToSend:  0,
+		NotifyID:    0,
+		Extra:       make(map[string]string),
+	}
+}
+
+//-----------------------------------------------------------------------------------//
+// 发送给IOS设备的Message对象
+func NewIOSMessage(description string) *Message {
+	return &Message{
+		UniqueID:    "",
+		Payload:     "",
+		Title:       "",
+		Description: description,
+		PassThrough: 0,
+		NotifyType:  -1, // default notify type
+		TimeToLive:  0,
+		TimeToSend:  0,
+		NotifyID:    0,
+		Extra:       make(map[string]string),
+	}
+}
+
+// 可选项，自定义通知数字角标。
+func (i *Message) SetBadge(badge int64) *Message {
+	i.Extra["badge"] = strconv.FormatInt(badge, 10)
+	return i
+}
+
+// 可选项，iOS8推送消息快速回复类别。
+func (i *Message) SetCategory(category string) *Message {
+	i.Extra["category"] = category
+	return i
+}
+
+// 可选项，自定义消息铃声。
+func (i *Message) SetSoundURL(soundURL string) *Message {
+	i.Extra["sound_url"] = soundURL
+	return i
 }
 
 //-----------------------------------------------------------------------------------//
@@ -160,39 +195,4 @@ func (tm *TargetedMessage) JSON() []byte {
 		panic(err)
 	}
 	return bytes
-}
-
-//-----------------------------------------------------------------------------------//
-// 发送给IOS设备的Message对象
-func NewIOSMessage(description string) *Message {
-	return &Message{
-		UniqueID:    "",
-		Payload:     "",
-		Title:       "",
-		Description: description,
-		PassThrough: 0,
-		NotifyType:  -1, // default notify type
-		TimeToLive:  0,
-		TimeToSend:  0,
-		NotifyID:    0,
-		Extra:       make(map[string]string),
-	}
-}
-
-// 可选项，自定义通知数字角标。
-func (i *Message) SetBadge(badge int64) *Message {
-	i.Extra["badge"] = strconv.FormatInt(badge, 10)
-	return i
-}
-
-// 可选项，iOS8推送消息快速回复类别。
-func (i *Message) SetCategory(category string) *Message {
-	i.Extra["category"] = category
-	return i
-}
-
-// 可选项，自定义消息铃声。
-func (i *Message) SetSoundURL(soundURL string) *Message {
-	i.Extra["sound_url"] = soundURL
-	return i
 }

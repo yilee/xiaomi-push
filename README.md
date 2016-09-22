@@ -28,7 +28,7 @@ func main() {
 - [x] SendToAliasList(msg *Message, aliasList []string)
 - [x] SendToUserAccount(msg *Message, userAccount string) 
 - [x] SendToUserAccountList(msg *Message, accountList []string)
-- [ ] Broadcast(msg *Message, topic string)
+- [x] Broadcast(msg *Message, topic string)
 - [x] BroadcastAll(msg *Message) (*SendResult, error)
 - [x] MultiTopicBroadcast(msg *Message, topics []string, topicOP TopicOP)
 - [x] CheckScheduleJobExist(msgID string)
