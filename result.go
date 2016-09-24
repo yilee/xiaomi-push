@@ -78,12 +78,12 @@ type AliasesOfRegIDResult struct {
 	Result
 	Data struct {
 		List []string `json:"list,omitempty"`
-	} `json`
+	} `json:"data,omitempty"`
 }
 
 type TopicsOfRegIDResult struct {
 	Result
 	Data struct {
 		List []string `json:"list,omitempty"`
-	} `json`
+	} `json:"data,omitempty"`
 }
