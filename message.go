@@ -3,26 +3,33 @@ package xiaomipush
 import (
 	"encoding/json"
 	"strconv"
+	"strings"
 	"time"
 )
 
 type Message struct {
-	UniqueID    string            `json:"unique_id"`    // 消息唯一ID
-	Payload     string            `json:"payload"`      // 消息内容payload
-	Title       string            `json:"title"`        // 通知栏展示的通知的标题
-	Description string            `json:"description"`  // 通知栏展示的通知的描述
-	PassThrough int32             `json:"pass_through"` // 是否通过透传的方式送给app，1表示透传消息，0表示通知栏消息。
-	NotifyType  int32             `json:"notify_type"`  // DEFAULT_ALL = -1; DEFAULT_SOUND  = 1;   // 使用默认提示音提示 DEFAULT_VIBRATE = 2;   // 使用默认震动提示 DEFAULT_LIGHTS = 4;    // 使用默认led灯光提示
-	TimeToLive  int64             `json:"time_to_live"` // 可选项。如果用户离线，设置消息在服务器保存的时间，单位：ms。服务器默认最长保留两周。
-	TimeToSend  int64             `json:"time_to_send"` // 可选项。定时发送消息。timeToSend是以毫秒为单位的时间戳。注：仅支持七天内的定时消息。
-	NotifyID    int64             `json:"notify_id"`    // 可选项。默认情况下，通知栏只显示一条推送消息。如果通知栏要显示多条推送消息，需要针对不同的消息设置不同的notify_id（相同notify_id的通知栏消息会覆盖之前的）。
-	Extra       map[string]string `json:"extra"`        // 可选项，对app提供一些扩展的功能，请参考2.2。除了这些扩展功能，开发者还可以定义一些key和value来控制客户端的行为。注：key和value的字符数不能超过1024，至多可以设置10个key-value键值对。
+	RestrictedPackageName string            `json:"restricted_package_name,omitempty"` // 设置app的多包名packageNames（多包名发送广播消息）。p
+	UniqueID              string            `json:"unique_id,omitempty,omitempty"`     // 消息唯一ID
+	Payload               string            `json:"payload,omitempty"`                 // 消息内容payload
+	Title                 string            `json:"title,omitempty"`                   // 通知栏展示的通知的标题
+	Description           string            `json:"description,omitempty"`             // 通知栏展示的通知的描述
+	PassThrough           int32             `json:"pass_through"`                      // 是否通过透传的方式送给app，1表示透传消息，0表示通知栏消息。
+	NotifyType            int32             `json:"notify_type,omitempty"`             // DEFAULT_ALL = -1; DEFAULT_SOUND  = 1;   // 使用默认提示音提示 DEFAULT_VIBRATE = 2;   // 使用默认震动提示 DEFAULT_LIGHTS = 4;    // 使用默认led灯光提示
+	TimeToLive            int64             `json:"time_to_live,omitempty"`            // 可选项。如果用户离线，设置消息在服务器保存的时间，单位：ms。服务器默认最长保留两周。
+	TimeToSend            int64             `json:"time_to_send,omitempty"`            // 可选项。定时发送消息。timeToSend是以毫秒为单位的时间戳。注：仅支持七天内的定时消息。
+	NotifyID              int64             `json:"notify_id"`                         // 可选项。默认情况下，通知栏只显示一条推送消息。如果通知栏要显示多条推送消息，需要针对不同的消息设置不同的notify_id（相同notify_id的通知栏消息会覆盖之前的）。
+	Extra                 map[string]string `json:"extra,omitempty"`                   // 可选项，对app提供一些扩展的功能，请参考2.2。除了这些扩展功能，开发者还可以定义一些key和value来控制客户端的行为。注：key和value的字符数不能超过1024，至多可以设置10个key-value键值对。
 }
 
 const (
 	MaxTimeToSend = time.Hour * 24 * 7
 	MaxTimeToLive = time.Hour * 24 * 7 * 2
 )
+
+func (m *Message) SetRestrictedPackageName(restrictedPackageNames []string) *Message {
+	m.RestrictedPackageName = strings.Join(restrictedPackageNames, ",")
+	return m
+}
 
 func (m *Message) SetUniqueID(uniqueID string) *Message {
 	m.UniqueID = uniqueID
@@ -86,6 +93,12 @@ func (m *Message) SetCallback(callbackURL string) *Message {
 	m.Extra["callback"] = callbackURL
 	m.Extra["callback.param"] = m.UniqueID
 	m.Extra["callback.type"] = "3" // 1:送达回执, 2:点击回执, 3:送达和点击回执
+	return m
+}
+
+// 添加自定义字段, 客户端使用
+func (m *Message) AddExtra(key, value string) *Message {
+	m.Extra[key] = value
 	return m
 }
 

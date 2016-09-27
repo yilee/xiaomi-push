@@ -5,12 +5,12 @@ import (
 	"time"
 )
 
-var packageName string = "com.xiaomi.mipushdemo"
+var packageName string = "sbkssbkssbkssbkssbkssbkssbkssbks"
 
-var client = NewClient("yourappSecret", []string{packageName})
+var client = NewClient("sbkssbkssbkssbkssbkssbkssbkssbks", []string{packageName})
 
-var msg1 *Message = NewAndroidMessage("hi baby1", "hi1").SetPayload("this is payload1").SetPassThrough(0)
-var msg2 *Message = NewAndroidMessage("hi baby2", "hi2 ").SetPayload("this is payload2").SetPassThrough(0)
+var msg1 *Message = NewAndroidMessage("hi baby1", "hi1").SetPayload("开心么1").SetPassThrough(0)
+var msg2 *Message = NewAndroidMessage("hi baby2", "hi2 ").SetPayload("开心么2").SetPassThrough(1)
 
 var regID1 string = "WFioJi0fiIco7vOrI4dnxxjeKAUqR7fjugoGkHUgxeo="
 var regID2 string = "52Pe7fPIRXWsXhzn4eYJ1njYhBhN8Lcp8IJPOMjThdk="
@@ -40,9 +40,8 @@ func TestMiPush_SendToList(t *testing.T) {
 	t.Logf("result=%#v\n", result)
 }
 
-// Not Finished
 func TestMiPush_SendTargetMessageList(t *testing.T) {
-	msgList := []*TargetedMessage{NewTargetedMessage(msg1, regID1, TargetTypeRegID), NewTargetedMessage(msg2, regID2, TargetTypeRegID)}
+	msgList := []*TargetedMessage{NewTargetedMessage(msg1.SetRestrictedPackageName(client.packageName), regID1, TargetTypeRegID), NewTargetedMessage(msg2.SetRestrictedPackageName(client.packageName), regID2, TargetTypeRegID)}
 	result, err := client.SendTargetMessageList(msgList)
 	if err != nil {
 		t.Errorf("TestMiPush_SendTargetMessageList failed :%v\n", err)
@@ -82,7 +81,6 @@ func TestMiPush_SendToUserAccountList(t *testing.T) {
 	t.Logf("result=%#v\n", result)
 }
 
-// Not Finished
 func TestMiPush_Broadcast(t *testing.T) {
 	result, err := client.Broadcast(msg1, topic1)
 	if err != nil {

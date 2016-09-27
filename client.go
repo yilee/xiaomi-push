@@ -48,6 +48,8 @@ func (m *MiPush) SendToList(msg *Message, regIDList []string) (*SendResult, erro
 
 // 发送一组消息。其中TargetedMessage类中封装了Message对象和该Message所要发送的目标。注意：messages内所有TargetedMessage对象的targetType必须相同，
 // 不支持在一个调用中同时给regid和alias发送消息。
+// 如果是定时消息, 所有消息的time_to_send必须相同
+// 消息必须设置packagename, 见client_test TestMiPush_SendTargetMessageList
 func (m *MiPush) SendTargetMessageList(msgList []*TargetedMessage) (*SendResult, error) {
 	if len(msgList) == 0 {
 		return nil, errors.New("empty msg")
@@ -437,17 +439,15 @@ func (m *MiPush) assembleSendParams(msg *Message, regID string) url.Values {
 func (m *MiPush) assembleTargetMessageListParams(msgList []*TargetedMessage) url.Values {
 	form := url.Values{}
 	type OneMsg struct {
-		Target  string `json:"target"`
-		Message string `json:"message"`
+		Target  string   `json:"target"`
+		Message *Message `json:"message"`
 	}
-	messages := struct {
-		Messages []*OneMsg `json:"messages"`
-	}{}
+	var messages []*OneMsg
 
 	for _, m := range msgList {
-		messages.Messages = append(messages.Messages, &OneMsg{
+		messages = append(messages, &OneMsg{
 			Target:  m.target,
-			Message: string(m.message.JSON()),
+			Message: m.message,
 		})
 	}
 	bytes, err := json.Marshal(messages)
@@ -455,6 +455,7 @@ func (m *MiPush) assembleTargetMessageListParams(msgList []*TargetedMessage) url
 		panic(err)
 	}
 	form.Add("messages", string(bytes))
+	form.Add("time_to_send", strconv.FormatInt(msgList[0].message.TimeToSend, 10))
 	return form
 }
 
