@@ -23,7 +23,7 @@ func main() {
 
 - [x] Send(msg *Message, regID string)
 - [x] SendToList(msg *Message, regIDList []string)
-- [ ] SendTargetMessageList(msgList []*TargetedMessage)
+- [x] SendTargetMessageList(msgList []*TargetedMessage)
 - [x] SendToAlias(msg *Message, alias string)
 - [x] SendToAliasList(msg *Message, aliasList []string)
 - [x] SendToUserAccount(msg *Message, userAccount string) 
