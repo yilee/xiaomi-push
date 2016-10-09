@@ -3,6 +3,7 @@ package xiaomipush
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -617,8 +618,15 @@ func (m *MiPush) doPost(url string, form url.Values) ([]byte, error) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
 	req.Header.Set("Authorization", "key="+m.appSecret)
 	client := &http.Client{}
+	tryTime := 0
+tryAgain:
 	resp, err = client.Do(req)
 	if err != nil {
+		fmt.Println("xiaomi push post err", err, tryTime)
+		tryTime += 1
+		if tryTime < PostRetryTimes {
+			goto tryAgain
+		}
 		return nil, err
 	}
 	result, err = m.handleResponse(resp)

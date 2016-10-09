@@ -45,6 +45,10 @@ const (
 	TopicsAllURL = "/v1/topic/all" // 获取一个应用的某个用户的目前订阅的所有Topic
 )
 
+var (
+	PostRetryTimes = 3
+)
+
 // for future targeted push
 var (
 	BrandsMap = map[string]string{
