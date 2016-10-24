@@ -44,6 +44,9 @@ func (m *MiPush) Send(msg *Message, regID string) (*SendResult, error) {
 // 根据regIds，发送消息到指定的一组设备上
 // regIds的个数不得超过1000个。
 func (m *MiPush) SendToList(msg *Message, regIDList []string) (*SendResult, error) {
+	if len(regIDList) == 0 || len(regIDList) > 1000 {
+		panic("wrong number regIDList")
+	}
 	return m.Send(msg, strings.Join(regIDList, ","))
 }
 
@@ -100,6 +103,9 @@ func (m *MiPush) SendToAlias(msg *Message, alias string) (*SendResult, error) {
 // 根据aliasList，发送消息到指定的一组设备上
 // 元素的个数不得超过1000个。
 func (m *MiPush) SendToAliasList(msg *Message, aliasList []string) (*SendResult, error) {
+	if len(aliasList) == 0 || len(aliasList) > 1000 {
+		panic("wrong number aliasList")
+	}
 	return m.SendToAlias(msg, strings.Join(aliasList, ","))
 }
 
@@ -121,6 +127,9 @@ func (m *MiPush) SendToUserAccount(msg *Message, userAccount string) (*SendResul
 // 根据accountList，发送消息到指定的一组设备上
 // 元素的个数不得超过1000个。
 func (m *MiPush) SendToUserAccountList(msg *Message, accountList []string) (*SendResult, error) {
+	if len(accountList) == 0 || len(accountList) > 1000 {
+		panic("wrong number accountList")
+	}
 	return m.SendToUserAccount(msg, strings.Join(accountList, ","))
 }
 
@@ -679,7 +688,7 @@ func (m *MiPush) defaultForm(msg *Message) url.Values {
 	}
 	form.Add("notify_type", strconv.FormatInt(int64(msg.NotifyType), 10))
 	form.Add("pass_through", strconv.FormatInt(int64(msg.PassThrough), 10))
-	if msg.NotifyID > 0 {
+	if msg.NotifyID != 0 {
 		form.Add("notify_id", strconv.FormatInt(int64(msg.NotifyID), 10))
 	}
 	if msg.TimeToSend > 0 {
