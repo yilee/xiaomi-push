@@ -9,7 +9,6 @@ import (
 
 type Message struct {
 	RestrictedPackageName string            `json:"restricted_package_name,omitempty"` // 设置app的多包名packageNames（多包名发送广播消息）。p
-	UniqueID              string            `json:"unique_id,omitempty,omitempty"`     // 消息唯一ID
 	Payload               string            `json:"payload,omitempty"`                 // 消息内容payload
 	Title                 string            `json:"title,omitempty"`                   // 通知栏展示的通知的标题
 	Description           string            `json:"description,omitempty"`             // 通知栏展示的通知的描述
@@ -28,11 +27,6 @@ const (
 
 func (m *Message) SetRestrictedPackageName(restrictedPackageNames []string) *Message {
 	m.RestrictedPackageName = strings.Join(restrictedPackageNames, ",")
-	return m
-}
-
-func (m *Message) SetUniqueID(uniqueID string) *Message {
-	m.UniqueID = uniqueID
 	return m
 }
 
@@ -91,7 +85,6 @@ func (m *Message) SetJobKey(jobKey string) *Message {
 // 小米推送服务器每隔1s将已送达或已点击的消息ID和对应设备的regid或alias通过调用第三方http接口传给开发者。
 func (m *Message) SetCallback(callbackURL string) *Message {
 	m.Extra["callback"] = callbackURL
-	m.Extra["callback.param"] = m.UniqueID
 	m.Extra["callback.type"] = "3" // 1:送达回执, 2:点击回执, 3:送达和点击回执
 	return m
 }
@@ -114,7 +107,6 @@ func (m *Message) JSON() []byte {
 // 发送给Android设备的Message对象
 func NewAndroidMessage(title, description string) *Message {
 	return &Message{
-		UniqueID:    "",
 		Payload:     "",
 		Title:       title,
 		Description: description,
@@ -156,7 +148,6 @@ func (m *Message) SetPayload(payload string) *Message {
 // 发送给IOS设备的Message对象
 func NewIOSMessage(description string) *Message {
 	return &Message{
-		UniqueID:    "",
 		Payload:     "",
 		Title:       "",
 		Description: description,

@@ -2,7 +2,6 @@ package xiaomipush
 
 const (
 	ProductionHost = "https://api.xmpush.xiaomi.com"
-	SandboxHost    = "https://sandbox.xmpush.xiaomi.com" // iOS supported only
 )
 
 const (

@@ -694,7 +694,7 @@ func (m *MiPush) defaultForm(msg *Message) url.Values {
 	if msg.TimeToSend > 0 {
 		form.Add("time_to_send", strconv.FormatInt(int64(msg.TimeToSend), 10))
 	}
-	if msg.Extra != nil && len(msg.Extra) > 0 {
+	if len(msg.Extra) > 0 {
 		for k, v := range msg.Extra {
 			form.Add("extra."+k, v)
 		}
