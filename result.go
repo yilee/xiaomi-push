@@ -6,6 +6,7 @@ type Result struct {
 	Code        int64  `json:"code"`
 	Description string `json:"description,omitempty"`
 	Info        string `json:"info,omitempty"`
+	Reason      string `json:"reason,omitempty"`
 }
 
 type SendResult struct {
